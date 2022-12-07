@@ -19,13 +19,14 @@ import qualified Database.SQLite.Simple             as Sql
 import qualified Common.SQLite.Error                as Sql
 import           Common.SQLite.Error                (SQLiteResponse)
 
-import           Level07.AppM                       (App, Env, envDB)
+import           Level07.AppM                       (App, Env(..))
 import           Level07.Types                      (Comment, CommentText,
                                                      DBFilePath (getDBFilePath),
                                                      Error (DBError),
                                                      FirstAppDB(..),
-                                                     Topic, fromDBComment, dbConn)
+                                                     Topic, fromDBComment)
 import Control.Monad.Error.Class (liftEither)
+
 
 -- Quick helper to pull the connection and close it down.
 closeDB
@@ -54,9 +55,7 @@ initDB fp = Sql.runDBAction $ do
 
 getDBConn
   :: App Connection
--- TODO: WHY U NO WORK??
--- getDBConn = asks (.db.conn)
-getDBConn = asks $ dbConn . envDB
+getDBConn = asks $ (.db.conn)
 
 runDB
   :: (a -> Either Error b)

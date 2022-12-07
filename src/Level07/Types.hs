@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
 
 module Level07.Types
   ( Error (..)
@@ -20,7 +22,6 @@ module Level07.Types
   , renderContentType
   , confPortToWai
   , fromDBComment
-  , dbConn
   ) where
 
 import           GHC.Generics               (Generic)
@@ -101,23 +102,15 @@ newtype Port = Port
   -- You will notice we're using ``Word16`` as our type for the ``Port`` value.
   -- This is because a valid port number can only be a 16bit unsigned integer.
   { getPort :: Word16 }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Show)
+  deriving (FromJSON,ToJSON) via Word16 -- derive ToJSON, FromJSON, using the underlaying Word16 value
 
-instance FromJSON Port where
-  -- TODO: Why is this necessary???
-  parseJSON = Aeson.genericParseJSON unwrapNewtype
 
 newtype DBFilePath = DBFilePath
   { getDBFilePath :: FilePath }
-  deriving (Eq, Show, Generic)
+  deriving stock (Eq, Show, Generic) -- specifying stock deriving
+  deriving newtype (ToJSON,FromJSON) -- derive ToJSON, FromJSON, using the underllaying FilePath value
 
-instance FromJSON DBFilePath where
-  -- TODO: Why is this necessary???
-  parseJSON = Aeson.genericParseJSON unwrapNewtype
-
--- TODO: Why is this necessary???
-unwrapNewtype :: Aeson.Options
-unwrapNewtype = Aeson.defaultOptions { Aeson.unwrapUnaryRecords = True }
 
 -- Add some fields to the ``Conf`` type:
 -- - A customisable port number: ``Port``
@@ -200,6 +193,3 @@ newtype FirstAppDB = FirstAppDB
   { conn  :: Connection
   }
 
--- TODO: Why????
-dbConn :: FirstAppDB -> Connection
-dbConn = (.conn)

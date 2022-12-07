@@ -4,7 +4,6 @@ module Level07.AppM
   , Env (..)
   , runAppM
   , runApp
-  , envDB
   ) where
 
 import           Control.Monad.Except   (MonadError (..))
@@ -33,9 +32,6 @@ data Env = Env
   , db        :: FirstAppDB
   }
 
--- TODO: Remove
-envDB :: Env -> FirstAppDB
-envDB env = env.db
 
 -- | It would be nice to remove the need to pass around our Env to every
 -- function that needs it. Wouldn't it be great to have our functions run where
